@@ -1,0 +1,57 @@
+{
+  "policy_set": "conflict-demonstration",
+  "version": "1.0",
+  "description": "A DELIBERATELY FLAWED policy set used ONLY to demonstrate the static policy analyser's detection capabilities. This is NOT the deployed policy set (see policies.json for the live set). It intentionally contains a contradiction, a duplicate, a shadowing relationship, and coverage gaps so that policy_analyser.py can be shown catching each class of problem. Referenced in the dissertation evaluation chapter as a controlled test of the analyser.",
+  "default_effect": "ALLOW",
+  "attributes": [
+    "attempts_authority_override",
+    "attempts_system_extraction",
+    "attempts_execution",
+    "attempts_persona_override",
+    "attempts_sensitive_output",
+    "llm_judged_unsafe",
+    "source_is_external"
+  ],
+  "policies": [
+    {
+      "id": "DEMO-001",
+      "description": "Block authority override (broad).",
+      "subject": "any",
+      "condition": { "all_of": ["attempts_authority_override"] },
+      "effect": "DENY",
+      "severity": "high"
+    },
+    {
+      "id": "DEMO-002",
+      "description": "Allow authority override — CONTRADICTS DEMO-001 on the same condition.",
+      "subject": "any",
+      "condition": { "all_of": ["attempts_authority_override"] },
+      "effect": "ALLOW",
+      "severity": "high"
+    },
+    {
+      "id": "DEMO-003",
+      "description": "Block authority override from external content — SHADOWED by the broader DEMO-001.",
+      "subject": "external",
+      "condition": { "all_of": ["source_is_external", "attempts_authority_override"] },
+      "effect": "DENY",
+      "severity": "critical"
+    },
+    {
+      "id": "DEMO-004",
+      "description": "Block execution.",
+      "subject": "any",
+      "condition": { "all_of": ["attempts_execution"] },
+      "effect": "DENY",
+      "severity": "high"
+    },
+    {
+      "id": "DEMO-005",
+      "description": "Block execution again — DUPLICATE of DEMO-004.",
+      "subject": "any",
+      "condition": { "all_of": ["attempts_execution"] },
+      "effect": "DENY",
+      "severity": "high"
+    }
+  ]
+}

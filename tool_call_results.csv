@@ -1,0 +1,7 @@
+Tool,Source,Args,Decision,Reason
+search,user,{'query': 'latest AI news'},ALLOW,Tool 'search' permitted for source 'user'
+delete_records,user,{'table': 'users'},DENY,Tool 'delete_records' is not permitted for source 'user'
+summarise,external,{'text': 'The report shows 12% growth.'},ALLOW,Tool 'summarise' permitted for source 'external'
+run_script,external,{'cmd': 'drop table users'},DENY,Tool 'run_script' is not permitted for source 'external'
+calculate,user,{'expression': '15 * 4'},ALLOW,Tool 'calculate' permitted for source 'user'
+invoke_api,external,{'endpoint': '/admin/reset'},DENY,Tool 'invoke_api' is not permitted for source 'external'

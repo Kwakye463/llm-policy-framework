@@ -1,0 +1,21 @@
+# Virtual environment — never commit; recreate with pip install -r requirements.txt
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS junk
+.DS_Store
+__MACOSX/
+._*
+
+# Temporary / scratch files
+test_input.json
+*.tmp
+
+# OPA binary (installed system-wide via brew)
+opa

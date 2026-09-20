@@ -1,0 +1,143 @@
+
+{
+  "policy_set": "llm-prompt-injection-defence",
+  "version": "2.0",
+  "description": "Declarative security policy set for LLM prompt injection defence. Policies are data, not code: this document is compiled to Rego and enforced by OPA. A security administrator edits this file to change enforcement behaviour without modifying any application or policy-engine code. Version 2.0 distinguishes direct user-originated attacks from indirect injection via untrusted external content, assigning higher severity to the latter because the user is unaware the manipulation is occurring.",
+  "default_effect": "ALLOW",
+  "attributes": [
+    "attempts_authority_override",
+    "attempts_system_extraction",
+    "attempts_execution",
+    "attempts_persona_override",
+    "attempts_sensitive_output",
+    "attempts_roleplay_hijack",
+    "attempts_context_reset",
+    "attempts_prompt_leaking",
+    "llm_judged_unsafe",
+    "source_is_external"
+  ],
+  "policies": [
+    {
+      "id": "POL-001",
+      "description": "Block direct authority override originating from user input.",
+      "subject": "user",
+      "condition": {
+        "all_of": [
+          "attempts_authority_override"
+        ]
+      },
+      "effect": "DENY",
+      "severity": "high"
+    },
+    {
+      "id": "POL-002",
+      "description": "Block indirect authority override where untrusted external content attempts to override the model's instructions. Higher severity than direct override because the user is unaware the manipulation is occurring.",
+      "subject": "external",
+      "condition": {
+        "all_of": [
+          "source_is_external",
+          "attempts_authority_override"
+        ]
+      },
+      "effect": "DENY",
+      "severity": "critical"
+    },
+    {
+      "id": "POL-003",
+      "description": "Block any attempt to extract the model's system prompt or internal configuration.",
+      "subject": "any",
+      "condition": {
+        "all_of": [
+          "attempts_system_extraction"
+        ]
+      },
+      "effect": "DENY",
+      "severity": "high"
+    },
+    {
+      "id": "POL-004",
+      "description": "Block execution attempts that originate from untrusted external content (indirect injection via RAG or documents).",
+      "subject": "external",
+      "condition": {
+        "all_of": [
+          "source_is_external",
+          "attempts_execution"
+        ]
+      },
+      "effect": "DENY",
+      "severity": "critical"
+    },
+    {
+      "id": "POL-005",
+      "description": "Block attempts to make the model adopt an unrestricted or unsafe persona.",
+      "subject": "any",
+      "condition": {
+        "all_of": [
+          "attempts_persona_override"
+        ]
+      },
+      "effect": "DENY",
+      "severity": "high"
+    },
+    {
+      "id": "POL-006",
+      "description": "Block attempts to extract sensitive data such as credentials, API keys, or private information.",
+      "subject": "any",
+      "condition": {
+        "all_of": [
+          "attempts_sensitive_output"
+        ]
+      },
+      "effect": "DENY",
+      "severity": "critical"
+    },
+    {
+      "id": "POL-007",
+      "description": "Block roleplay or task-hijacking attempts that use a legitimate-sounding framing to pivot the model into attacker-controlled behaviour.",
+      "subject": "any",
+      "condition": {
+        "all_of": [
+          "attempts_roleplay_hijack"
+        ]
+      },
+      "effect": "DENY",
+      "severity": "high"
+    },
+    {
+      "id": "POL-008",
+      "description": "Block context-reset attempts that try to discard prior instructions and inject a fresh attacker-controlled task.",
+      "subject": "any",
+      "condition": {
+        "all_of": [
+          "attempts_context_reset"
+        ]
+      },
+      "effect": "DENY",
+      "severity": "high"
+    },
+    {
+      "id": "POL-009",
+      "description": "Block prompt-leaking attempts that try to make the model echo or print the hidden instructions above the user message.",
+      "subject": "any",
+      "condition": {
+        "all_of": [
+          "attempts_prompt_leaking"
+        ]
+      },
+      "effect": "DENY",
+      "severity": "high"
+    },
+    {
+      "id": "POL-010",
+      "description": "Block any prompt the independent LLM semantic classifier judges unsafe. Acts as a catch-all for novel phrasing that evades the structural signal policies above.",
+      "subject": "any",
+      "condition": {
+        "all_of": [
+          "llm_judged_unsafe"
+        ]
+      },
+      "effect": "DENY",
+      "severity": "medium"
+    }
+  ]
+}
